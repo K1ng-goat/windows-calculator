@@ -24,25 +24,24 @@ defineProps({
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-end;
-  padding: 12px 16px;
-  min-height: 120px;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px 4px 0 0;
+  padding: var(--padding-display);
+  min-height: var(--display-min-height);
+  background: var(--color-display-bg);
 }
 
 .display__expression {
-  font-size: 14px;
-  color: #888;
+  font-size: var(--font-size-display-expr);
+  color: var(--color-text-secondary);
   min-height: 20px;
   word-break: break-all;
   text-align: right;
+  line-height: 1.4;
 }
 
 .display__value {
-  font-size: 36px;
+  font-size: var(--font-size-display-value);
   font-weight: 300;
-  color: #222;
+  color: var(--color-text-primary);
   word-break: break-all;
   text-align: right;
   line-height: 1.2;

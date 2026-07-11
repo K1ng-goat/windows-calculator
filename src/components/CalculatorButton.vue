@@ -9,6 +9,11 @@ defineProps({
     default: 'number',
     validator: (value) => ['number', 'operator', 'function'].includes(value),
   },
+  /** Optional style override — used for the equals button. */
+  variant: {
+    type: String,
+    default: '',
+  },
 })
 
 defineEmits(['click'])
@@ -17,7 +22,7 @@ defineEmits(['click'])
 <template>
   <button
     class="btn"
-    :class="`btn--${type}`"
+    :class="`btn--${variant || type}`"
     :aria-label="label"
     @click="$emit('click')"
   >
@@ -31,31 +36,51 @@ defineEmits(['click'])
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 52px;
-  border: 1px solid #e0e0e0;
-  font-size: 16px;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  height: var(--btn-height);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-btn-number);
+  font-family: var(--font-family);
+  color: var(--color-text-btn);
   cursor: pointer;
   outline: none;
+  user-select: none;
+  transition: background-color var(--transition-btn);
 }
 
+/* ---- number ------------------------------------------------------ */
 .btn--number {
-  background: #fafafa;
-  color: #333;
+  background: var(--color-btn-number);
   font-weight: 400;
 }
+.btn--number:hover   { background: var(--color-btn-number-hover); }
+.btn--number:active  { background: var(--color-btn-number-active); }
 
+/* ---- operator ---------------------------------------------------- */
 .btn--operator {
-  background: #f0f0f0;
-  color: #333;
-  font-size: 20px;
+  background: var(--color-btn-operator);
+  font-size: var(--font-size-btn-operator);
   font-weight: 400;
 }
+.btn--operator:hover  { background: var(--color-btn-operator-hover); }
+.btn--operator:active { background: var(--color-btn-operator-active); }
 
+/* ---- function ---------------------------------------------------- */
 .btn--function {
-  background: #e8e8e8;
-  color: #333;
-  font-size: 14px;
+  background: var(--color-btn-function);
+  font-size: var(--font-size-btn-function);
   font-weight: 400;
 }
+.btn--function:hover  { background: var(--color-btn-function-hover); }
+.btn--function:active { background: var(--color-btn-function-active); }
+
+/* ---- equals (Windows accent blue) -------------------------------- */
+.btn--equals {
+  background: var(--color-btn-equals);
+  font-size: var(--font-size-btn-operator);
+  font-weight: 400;
+  color: var(--color-btn-equals-text);
+  border-color: var(--color-btn-equals);
+}
+.btn--equals:hover  { background: var(--color-btn-equals-hover); }
+.btn--equals:active { background: var(--color-btn-equals-active); }
 </style>

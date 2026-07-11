@@ -50,8 +50,8 @@ function handleButtonClick({ label, type }) {
     switch (label) {
       case 'C':  clear();        break
       case 'CE': clearEntry();   break
-      case '⌫': backspace(); break   // ⌫
-      case '±': toggleSign(); break   // ±
+      case '⌫': backspace(); break
+      case '±': toggleSign(); break
       case '%':  percent();      break
       // √, x², 1/x — reserved for future implementation
       default: break
@@ -73,20 +73,3 @@ function handleButtonClick({ label, type }) {
     </div>
   </div>
 </template>
-
-<style scoped>
-.app {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: #e8e8e8;
-}
-
-.calculator {
-  width: 320px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
-  border-radius: 4px;
-}
-</style>

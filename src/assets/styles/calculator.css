@@ -1,0 +1,39 @@
+/* ===================================================================
+   Calculator Shell — page layout & responsive container
+   =================================================================== */
+
+/* ---- page centring ----------------------------------------------- */
+.app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+/* ---- calculator card --------------------------------------------- */
+.calculator {
+  width: 100%;
+  max-width: var(--calculator-width);
+  background: var(--color-calculator-bg);
+  border-radius: var(--radius-calculator);
+  box-shadow: var(--shadow-calculator);
+  overflow: hidden;
+}
+
+/* ---- responsive -------------------------------------------------- */
+@media (max-width: 360px) {
+  .app {
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .calculator {
+    max-width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+}
