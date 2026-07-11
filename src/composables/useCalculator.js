@@ -26,12 +26,32 @@ export function useCalculator() {
   const lastOp = ref(null)
   const lastOperand = ref(null)
 
+  // memory — history stack
+  const memoryHistory = ref([])      // Array<{ id: number, value: number }>
+  const memoryValue = ref(null)       // number | null — last item value
+  const isMemoryPanelOpen = ref(false)
+  let nextMemoryId = 1
+
+  /** Sync memoryValue to reflect the last history entry. */
+  function syncMemoryValue() {
+    const len = memoryHistory.value.length
+    memoryValue.value = len > 0 ? memoryHistory.value[len - 1].value : null
+  }
+
   // ---- helpers -------------------------------------------------------
+
+  /** Return a number with floating-point noise removed. */
+  function formatNumber(num) {
+    if (!Number.isFinite(num)) return num
+    return parseFloat(num.toPrecision(12))
+  }
+
+  /** Format a number for display (returns string). */
   function formatResult(num) {
     if (!Number.isFinite(num)) return 'Error'
-    // Strip floating-point noise (e.g. 0.1 + 0.2 → 0.30000000000000004)
-    const s = parseFloat(num.toPrecision(12)).toString()
-    return s.length > 16 ? parseFloat(num.toPrecision(10)).toString() : s
+    const cleaned = formatNumber(num)
+    const s = cleaned.toString()
+    return s.length > 16 ? parseFloat(cleaned.toPrecision(10)).toString() : s
   }
 
   function compute(a, op, b) {
@@ -217,11 +237,122 @@ export function useCalculator() {
     display.value = formatResult(value / 100)
   }
 
+  // ---- memory operations -------------------------------------------
+
+  /** MS — push current display value onto the memory stack. */
+  function memoryStore() {
+    const value = formatNumber(parseFloat(display.value))
+    if (isNaN(value)) return
+    memoryHistory.value.push({ id: nextMemoryId++, value })
+    syncMemoryValue()
+  }
+
+  /** MR — recall the most recent memory value to the display. */
+  function memoryRecall() {
+    clearError()
+    if (memoryValue.value === null) return
+    display.value = formatResult(memoryValue.value)
+    waiting.value = true
+  }
+
+  /** M+ — add current display value to the most recent memory entry. */
+  function memoryAdd() {
+    const value = formatNumber(parseFloat(display.value))
+    if (isNaN(value)) return
+    const last = memoryHistory.value[memoryHistory.value.length - 1]
+    if (last) {
+      last.value = formatNumber(last.value + value)
+    } else {
+      memoryHistory.value.push({ id: nextMemoryId++, value })
+    }
+    syncMemoryValue()
+  }
+
+  /** M− — subtract current display value from the most recent memory entry. */
+  function memorySubtract() {
+    const value = formatNumber(parseFloat(display.value))
+    if (isNaN(value)) return
+    const last = memoryHistory.value[memoryHistory.value.length - 1]
+    if (last) {
+      last.value = formatNumber(last.value - value)
+    } else {
+      memoryHistory.value.push({ id: nextMemoryId++, value: -value })
+    }
+    syncMemoryValue()
+  }
+
+  /** MC — remove the most recent memory entry. */
+  function memoryClear() {
+    memoryHistory.value.pop()
+    syncMemoryValue()
+  }
+
+  // ---- memory panel (per-item) operations ---------------------------
+
+  /** Recall a specific memory item to the display. */
+  function memoryItemRecall(id) {
+    clearError()
+    const item = memoryHistory.value.find(m => m.id === id)
+    if (!item) return
+    display.value = formatResult(item.value)
+    waiting.value = true
+    isMemoryPanelOpen.value = false
+  }
+
+  /** Add current display value to a specific memory item. */
+  function memoryItemAdd(id) {
+    const value = formatNumber(parseFloat(display.value))
+    if (isNaN(value)) return
+    const item = memoryHistory.value.find(m => m.id === id)
+    if (item) {
+      item.value = formatNumber(item.value + value)
+      syncMemoryValue()
+    }
+  }
+
+  /** Subtract current display value from a specific memory item. */
+  function memoryItemSubtract(id) {
+    const value = formatNumber(parseFloat(display.value))
+    if (isNaN(value)) return
+    const item = memoryHistory.value.find(m => m.id === id)
+    if (item) {
+      item.value = formatNumber(item.value - value)
+      syncMemoryValue()
+    }
+  }
+
+  /** Remove a specific memory item from the stack. */
+  function memoryItemClear(id) {
+    const idx = memoryHistory.value.findIndex(m => m.id === id)
+    if (idx !== -1) {
+      memoryHistory.value.splice(idx, 1)
+      syncMemoryValue()
+    }
+    // Auto-close panel when last item is removed
+    if (memoryHistory.value.length === 0) {
+      isMemoryPanelOpen.value = false
+    }
+  }
+
+  /** Toggle the memory panel open / closed. */
+  function toggleMemoryPanel() {
+    if (memoryHistory.value.length === 0) return
+    isMemoryPanelOpen.value = !isMemoryPanelOpen.value
+  }
+
+  /** Close the memory panel. */
+  function closeMemoryPanel() {
+    isMemoryPanelOpen.value = false
+  }
+
   // ---- expose --------------------------------------------------------
   return {
     // state
     display,
     expression,
+    memoryValue,
+    memoryHistory,
+    isMemoryPanelOpen,
     // methods
     inputNumber,
     inputDecimal,
@@ -232,5 +363,18 @@ export function useCalculator() {
     backspace,
     toggleSign,
     percent,
+    // memory row
+    memoryStore,
+    memoryRecall,
+    memoryAdd,
+    memorySubtract,
+    memoryClear,
+    // memory panel
+    memoryItemRecall,
+    memoryItemAdd,
+    memoryItemSubtract,
+    memoryItemClear,
+    toggleMemoryPanel,
+    closeMemoryPanel,
   }
 }
