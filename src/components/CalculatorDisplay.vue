@@ -32,10 +32,11 @@ defineProps({
 .display__expression {
   font-size: var(--font-size-display-expr);
   color: var(--color-text-secondary);
-  min-height: 20px;
+  min-height: 18px;
   word-break: break-all;
   text-align: right;
-  line-height: 1.4;
+  line-height: 1.3;
+  margin-bottom: 4px;
 }
 
 .display__value {
@@ -44,6 +45,6 @@ defineProps({
   color: var(--color-text-primary);
   word-break: break-all;
   text-align: right;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 </style>

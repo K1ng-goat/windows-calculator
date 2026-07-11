@@ -1,62 +1,72 @@
 /* ===================================================================
-   Windows Calculator — Design Tokens (CSS Custom Properties)
+   Windows 11 Calculator — Design Tokens (CSS Custom Properties)
    =================================================================== */
 
 :root {
   /* ---- palette: backgrounds -------------------------------------- */
   --color-page-bg:             #e8e8e8;
-  --color-calculator-bg:       #f2f2f2;
-  --color-display-bg:          #f5f5f5;
+  --color-calculator-bg:       #f3f3f3;
+  --color-display-bg:          #f3f3f3;
+  --color-titlebar-bg:         #f3f3f3;
 
   /* ---- palette: button surfaces ---------------------------------- */
-  --color-btn-number:          #fafafa;
+  --color-btn-number:          #ffffff;
   --color-btn-number-hover:    #f0f0f0;
   --color-btn-number-active:   #e0e0e0;
 
-  --color-btn-operator:        #f0f0f0;
-  --color-btn-operator-hover:  #e6e6e6;
-  --color-btn-operator-active: #d4d4d4;
+  --color-btn-operator:        #f5f5f5;
+  --color-btn-operator-hover:  #ebebeb;
+  --color-btn-operator-active: #dadada;
 
-  --color-btn-function:        #e8e8e8;
-  --color-btn-function-hover:  #dcdcdc;
-  --color-btn-function-active: #c8c8c8;
+  --color-btn-function:        #efefef;
+  --color-btn-function-hover:  #e3e3e3;
+  --color-btn-function-active: #d3d3d3;
 
-  /* equals — Windows accent blue */
+  /* equals — Windows 11 accent blue */
   --color-btn-equals:          #0078d4;
   --color-btn-equals-hover:    #1a8ad4;
   --color-btn-equals-active:   #006cbe;
   --color-btn-equals-text:     #ffffff;
 
+  /* memory row */
+  --color-memory-text:         #666666;
+  --color-memory-text-disabled: #b0b0b0;
+
   /* ---- palette: text --------------------------------------------- */
   --color-text-primary:        #1a1a1a;
   --color-text-secondary:      #888888;
   --color-text-btn:            #1a1a1a;
+  --color-titlebar-text:       #1a1a1a;
 
   /* ---- palette: borders ------------------------------------------ */
-  --color-border:              #e0e0e0;
+  --color-border:              #e8e8e8;
 
   /* ---- sizing ---------------------------------------------------- */
-  --calculator-width:          320px;
-  --btn-height:                52px;
-  --display-min-height:        120px;
+  --calculator-width:          324px;
+  --btn-height:                48px;
+  --display-min-height:        140px;
+  --titlebar-height:           32px;
+  --memory-row-height:         36px;
 
   /* ---- typography ------------------------------------------------ */
   --font-family:               'Segoe UI', system-ui, -apple-system,
                                sans-serif;
-  --font-size-display-value:   36px;
-  --font-size-display-expr:    14px;
-  --font-size-btn-number:      16px;
-  --font-size-btn-operator:    20px;
-  --font-size-btn-function:    14px;
+  --font-size-display-value:   42px;
+  --font-size-display-expr:    13px;
+  --font-size-btn-number:      15px;
+  --font-size-btn-operator:   18px;
+  --font-size-btn-function:   14px;
+  --font-size-memory:         12px;
+  --font-size-titlebar:       13px;
 
   /* ---- spacing --------------------------------------------------- */
   --gap-grid:                  1px;
-  --padding-display:           12px 16px;
+  --padding-display:           8px 20px;
 
   /* ---- radius & shadow ------------------------------------------- */
-  --radius-calculator:         4px;
-  --shadow-calculator:         0 4px 24px rgba(0, 0, 0, 0.12);
+  --radius-calculator:         8px;
+  --shadow-calculator:         0 2px 16px rgba(0, 0, 0, 0.15);
 
   /* ---- motion ---------------------------------------------------- */
-  --transition-btn:            0.12s ease;
+  --transition-btn:            0.10s ease;
 }

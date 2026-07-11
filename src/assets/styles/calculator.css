@@ -1,5 +1,5 @@
 /* ===================================================================
-   Calculator Shell — page layout & responsive container
+   Calculator Shell — page layout, title bar & responsive
    =================================================================== */
 
 /* ---- page centring ----------------------------------------------- */
@@ -19,6 +19,72 @@
   border-radius: var(--radius-calculator);
   box-shadow: var(--shadow-calculator);
   overflow: hidden;
+}
+
+/* ---- title bar --------------------------------------------------- */
+.titlebar {
+  display: flex;
+  align-items: center;
+  height: var(--titlebar-height);
+  padding: 0 8px 0 12px;
+  background: var(--color-titlebar-bg);
+  user-select: none;
+}
+
+.titlebar__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 16px;
+  cursor: default;
+  border-radius: 4px;
+}
+
+.titlebar__btn:hover {
+  background: #e0e0e0;
+}
+
+.titlebar__title {
+  flex: 1;
+  text-align: center;
+  font-size: var(--font-size-titlebar);
+  font-weight: 500;
+  color: var(--color-titlebar-text);
+}
+
+/* ---- memory row (inside keypad component) ------------------------ */
+.memory-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: var(--memory-row-height);
+  padding: 0 6px;
+  background: var(--color-calculator-bg);
+}
+
+.memory-btn {
+  flex: 1;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--color-memory-text-disabled);
+  font-size: var(--font-size-memory);
+  font-family: var(--font-family);
+  font-weight: 400;
+  cursor: default;
+  border-radius: 4px;
+  padding: 0 2px;
+  white-space: nowrap;
+}
+
+.memory-btn--dropdown {
+  flex: 0.5;
+  font-size: 14px;
 }
 
 /* ---- responsive -------------------------------------------------- */
