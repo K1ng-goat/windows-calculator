@@ -32,6 +32,11 @@ export function useCalculator() {
   const isMemoryPanelOpen = ref(false)
   let nextMemoryId = 1
 
+  // navigation & history panels
+  const isNavPanelOpen = ref(false)
+  const isHistoryPanelOpen = ref(false)
+  const calcHistory = ref([])         // Array<{ expression: string, result: string }>
+
   /** Sync memoryValue to reflect the last history entry. */
   function syncMemoryValue() {
     const len = memoryHistory.value.length
@@ -177,11 +182,17 @@ export function useCalculator() {
       return
     }
 
-    expression.value = `${prev} ${op} ${operand} =`
-    display.value = formatResult(result)
+    const exprStr = `${prev} ${op} ${operand} =`
+    const resultStr = formatResult(result)
+
+    expression.value = exprStr
+    display.value = resultStr
     firstOperand.value = null
     pendingOp.value = null
     waiting.value = true
+
+    // Record to calculation history
+    calcHistory.value.push({ expression: exprStr, result: resultStr })
   }
 
   /** Clear everything (C). */
@@ -345,6 +356,30 @@ export function useCalculator() {
     isMemoryPanelOpen.value = false
   }
 
+  // ---- navigation panel ---------------------------------------------
+
+  function toggleNavPanel() {
+    isNavPanelOpen.value = !isNavPanelOpen.value
+  }
+
+  function closeNavPanel() {
+    isNavPanelOpen.value = false
+  }
+
+  // ---- history panel ------------------------------------------------
+
+  function toggleHistoryPanel() {
+    isHistoryPanelOpen.value = !isHistoryPanelOpen.value
+  }
+
+  function closeHistoryPanel() {
+    isHistoryPanelOpen.value = false
+  }
+
+  function clearHistory() {
+    calcHistory.value = []
+  }
+
   // ---- expose --------------------------------------------------------
   return {
     // state
@@ -376,5 +411,14 @@ export function useCalculator() {
     memoryItemClear,
     toggleMemoryPanel,
     closeMemoryPanel,
+    // navigation & history
+    isNavPanelOpen,
+    isHistoryPanelOpen,
+    calcHistory,
+    toggleNavPanel,
+    closeNavPanel,
+    toggleHistoryPanel,
+    closeHistoryPanel,
+    clearHistory,
   }
 }

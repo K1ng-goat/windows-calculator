@@ -2,6 +2,8 @@
 import CalculatorDisplay from './components/CalculatorDisplay.vue'
 import CalculatorKeypad from './components/CalculatorKeypad.vue'
 import MemoryPanel from './components/MemoryPanel.vue'
+import NavigationPanel from './components/NavigationPanel.vue'
+import HistoryPanel from './components/HistoryPanel.vue'
 import { useCalculator } from './composables/useCalculator.js'
 
 const {
@@ -10,6 +12,9 @@ const {
   memoryValue,
   memoryHistory,
   isMemoryPanelOpen,
+  isNavPanelOpen,
+  isHistoryPanelOpen,
+  calcHistory,
   inputNumber,
   inputDecimal,
   selectOperator,
@@ -30,30 +35,22 @@ const {
   memoryItemClear,
   toggleMemoryPanel,
   closeMemoryPanel,
+  toggleNavPanel,
+  closeNavPanel,
+  toggleHistoryPanel,
+  closeHistoryPanel,
+  clearHistory,
 } = useCalculator()
 
-/**
- * Route a button click from the keypad to the correct handler.
- */
 function handleButtonClick({ label, type }) {
   if (type === 'number') {
-    if (label === '.') {
-      inputDecimal()
-    } else {
-      inputNumber(label)
-    }
+    if (label === '.') { inputDecimal() } else { inputNumber(label) }
     return
   }
-
   if (type === 'operator') {
-    if (label === '=') {
-      calculate()
-    } else {
-      selectOperator(label)
-    }
+    if (label === '=') { calculate() } else { selectOperator(label) }
     return
   }
-
   if (type === 'function') {
     switch (label) {
       case 'C':  clear();        break
@@ -65,7 +62,6 @@ function handleButtonClick({ label, type }) {
       default: break
     }
   }
-
   if (type === 'memory') {
     switch (label) {
       case 'MC': memoryClear();     break
@@ -82,11 +78,10 @@ function handleButtonClick({ label, type }) {
 <template>
   <div class="app">
     <div class="calculator">
-      <!-- Title bar -->
       <div class="titlebar">
-        <button class="titlebar__btn" aria-label="菜单">☰</button>
+        <button class="titlebar__btn" aria-label="菜单" @click="toggleNavPanel">☰</button>
         <span class="titlebar__title">标准</span>
-        <button class="titlebar__btn" aria-label="历史记录">🕗</button>
+        <button class="titlebar__btn" aria-label="历史记录" @click="toggleHistoryPanel">🕗</button>
       </div>
 
       <CalculatorDisplay
@@ -100,7 +95,18 @@ function handleButtonClick({ label, type }) {
       />
     </div>
 
-    <!-- Memory panel — rendered outside calculator for proper stacking -->
+    <NavigationPanel
+      v-if="isNavPanelOpen"
+      @close="closeNavPanel"
+    />
+
+    <HistoryPanel
+      v-if="isHistoryPanelOpen"
+      :calcHistory="calcHistory"
+      @close="closeHistoryPanel"
+      @clear="clearHistory"
+    />
+
     <MemoryPanel
       v-if="isMemoryPanelOpen"
       :memoryHistory="memoryHistory"
