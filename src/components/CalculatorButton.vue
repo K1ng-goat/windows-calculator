@@ -19,6 +19,7 @@ defineEmits(['click'])
     class="btn"
     :class="`btn--${type}`"
     :aria-label="label"
+    @click="$emit('click')"
   >
     {{ label }}
   </button>

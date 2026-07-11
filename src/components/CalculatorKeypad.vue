@@ -1,6 +1,8 @@
 <script setup>
 import CalculatorButton from './CalculatorButton.vue'
 
+defineEmits(['buttonClick'])
+
 const buttons = [
   // Row 1 — function row
   { label: '%',  type: 'function' },
@@ -42,6 +44,7 @@ const buttons = [
       :key="btn.label + btn.type"
       :label="btn.label"
       :type="btn.type"
+      @click="$emit('buttonClick', btn)"
     />
   </div>
 </template>
