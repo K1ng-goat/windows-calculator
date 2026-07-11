@@ -302,6 +302,262 @@ bbd8429 style: apply Windows Calculator visual theme
 
 ---
 
+### Phase 3.5: Windows 11 Calculator UI 适配
+
+**时间**: 2026-07-11 | **Git Commit**: `820248a`
+
+#### 阶段目标
+
+根据真实 Windows 11 自带计算器界面重新调整布局，**不修改计算逻辑**。
+
+#### Prompt 摘要
+
+> "根据真实 Windows 11 Calculator 截图调整当前项目布局。参考 Windows 11 Calculator Standard 模式。需要调整：顶部标题区域、Memory 操作区域、功能按钮重新排列、CSS 视觉风格。"
+
+#### AI 执行内容
+
+**Title Bar 新增**：
+- 左侧 ☰ 菜单按钮
+- 居中"标准"模式标题
+- 右侧 🕗 历史记录按钮
+
+**Memory Row 新增**：
+- MC / MR / M+ / M- / MS / M∨ 横向排列
+- 小字体灰色按钮，禁用态浅色
+
+**按钮重新排列（W11 标准模式）**：
+
+| 行 | 列1 | 列2 | 列3 | 列4 |
+|----|-----|-----|-----|-----|
+| 1 | % | CE | C | ⌫ |
+| 2 | 1/x | x² | √x | ÷ |
+| 3 | 7 | 8 | 9 | × |
+| 4 | 4 | 5 | 6 | − |
+| 5 | 1 | 2 | 3 | + |
+| 6 | +/− | 0 | . | = |
+
+**视觉调整**：
+- 计算器宽度 320→324px，圆角 4→8px
+- 按钮高度 52→48px，主字体 36→42px
+- 数字按钮 `#fafafa`→`#ffffff`（更白）
+- 新增 memory / titlebar CSS 变量
+
+#### 人工决策
+
+- Title Bar 使用纯视觉占位，不实现菜单和历史功能（阶段 3.8 接线）
+- Memory Row 按钮全部 `disabled`（阶段 3.6 实现逻辑）
+- ± 改为 +/− 更符合 W11 实际标签
+
+#### 修改文件（6 个）
+
+| 文件 | 操作 |
+|------|------|
+| `src/App.vue` | 修改 — 新增 Title Bar |
+| `src/components/CalculatorDisplay.vue` | 修改 — 放大字体 |
+| `src/components/CalculatorKeypad.vue` | 修改 — Memory Row + 按钮重排 |
+| `src/components/CalculatorButton.vue` | 修改 — 按钮视觉微调 |
+| `src/assets/styles/variables.css` | 修改 — W11 设计令牌 |
+| `src/assets/styles/calculator.css` | 修改 — Title Bar + Memory Row 样式 |
+
+#### Git 提交
+
+```
+820248a style(ui): adapt calculator layout to Windows 11 standard design
+```
+
+---
+
+### Phase 3.6: Memory 功能实现
+
+**时间**: 2026-07-11 | **Git Commit**: `c4c272e`
+
+#### 阶段目标
+
+实现标准计算器 Memory 区域全部功能（MS / MR / M+ / M- / MC），**不修改计算逻辑**。
+
+#### Prompt 摘要
+
+> "实现 Windows Calculator Memory 功能。在 useCalculator.js 中增加 memoryValue 状态以及 memoryStore/memoryRecall/memoryAdd/memorySubtract/memoryClear 方法。Memory Row 按钮绑定真实事件。MC/MR 在无记忆时禁用。"
+
+#### AI 执行内容
+
+**useCalculator.js 新增**：
+
+| 新增项 | 说明 |
+|--------|------|
+| `memoryValue` | `ref(null)` — 当前记忆值 |
+| `memoryStore()` | 保存 display 到 memory |
+| `memoryRecall()` | 从 memory 恢复到 display |
+| `memoryAdd()` | display 累加到 memory |
+| `memorySubtract()` | display 从 memory 减去 |
+| `memoryClear()` | 清空 memory |
+
+**CalculatorButton.vue 新增**：
+- `disabled` prop（Boolean, 默认 false）
+- `memory` 类型（透明背景、小字号、28px 高）
+- 禁用态样式（`#b0b0b0` 灰色）
+
+**CalculatorKeypad.vue 改动**：
+- Memory Row 替换为 CalculatorButton 组件
+- `hasMemory` computed 控制 MC/MR 禁用态
+- M+/M-/MS 始终可用
+
+**App.vue 改动**：
+- 新增 `type === 'memory'` 事件路由
+
+#### 人工决策
+
+- memory 操作不修改 expression（独立于计算流程）
+- M+/M- 初始 null 时从 0 开始（与 Windows Calculator 一致）
+- M∨ 始终禁用（阶段 3.7 实现面板）
+
+#### 修改文件（5 个）
+
+| 文件 | 操作 |
+|------|------|
+| `src/composables/useCalculator.js` | 修改 — +1 状态 + 5 方法 |
+| `src/components/CalculatorButton.vue` | 修改 — disabled + memory 类型 |
+| `src/components/CalculatorKeypad.vue` | 修改 — Memory Row 接线 |
+| `src/App.vue` | 修改 — memory 事件路由 |
+| `docs/ai_logs/phase3_memory.md` | 新建 |
+
+#### Git 提交
+
+```
+c4c272e feat(memory): implement calculator memory operations
+```
+
+---
+
+### Phase 3.7: Memory History Panel
+
+**时间**: 2026-07-11 | **Git Commit**: `d6a906a` / `8430fcb`
+
+#### 阶段目标
+
+将简单 Memory 升级为 Windows 11 风格的 Memory History 面板，支持多记忆条目管理。
+
+#### Prompt 摘要
+
+> "升级 Memory 数据结构为 memoryHistory 数组。实现 M∨ 展开面板。面板支持：多条记忆显示、hover 显示 MC/M+/M-、条目 Recall、遮罩关闭。解决浮点精度问题。"
+
+#### AI 执行内容
+
+**数据结构升级**：
+
+```
+旧: memoryValue: null | number
+新: memoryHistory: Array<{ id, value }>
+    memoryValue: 同步自 history 最后条目
+    isMemoryPanelOpen: boolean
+```
+
+**MemoryPanel.vue 新组件**：
+- `fixed` 居中遮罩面板（260px）
+- 列表 `reverse()` 最新在上
+- hover 时显示 MC / M+ / M- 操作按钮
+- 点击条目值 → Recall 到 display
+- 空列表显示"没有可用的记忆项目"
+- 全部删除后面板自动关闭
+
+**per-item 方法**：
+- `memoryItemRecall(id)` — 回显指定条目
+- `memoryItemAdd(id)` — 累加到指定条目
+- `memoryItemSubtract(id)` — 从指定条目减去
+- `memoryItemClear(id)` — 删除指定条目
+
+**浮点精度修复**：
+- 新增 `formatNumber(num)` 统一精度处理
+- 所有 memory 写入操作（MS/M+/M-/itemAdd/itemSubtract）调用 `formatNumber`
+- 解决 `0.1 + 0.2` → memory 显示 `0.30000000000000004` 问题
+
+#### 人工决策
+
+- `memoryValue` 保留作为同步引用（兼容 MC/MR 禁用逻辑）
+- 面板使用 `fixed` 定位（避免被 calculator 的 `overflow:hidden` 裁剪）
+- M∨ 独立 emit `togglePanel`（与 memory 操作事件路径分离）
+
+#### 修改文件（5 个）
+
+| 文件 | 操作 |
+|------|------|
+| `src/composables/useCalculator.js` | 修改 — history 数据结构 + 精度修复 |
+| `src/components/MemoryPanel.vue` | **新建** |
+| `src/components/CalculatorKeypad.vue` | 修改 — M∨ toggle |
+| `src/App.vue` | 修改 — MemoryPanel 集成 |
+| `docs/ai_logs/phase3_memory_history.md` | 新建 |
+
+#### Git 提交
+
+```
+8430fcb fix(memory): normalize floating point precision in memory operations
+d6a906a feat(memory): add memory history panel with item operations
+```
+
+---
+
+### Phase 3.8: Navigation & Calculation History Panel
+
+**时间**: 2026-07-11 | **Git Commit**: `8af6507`
+
+#### 阶段目标
+
+实现 Title Bar 两个按钮的实际交互：☰ 导航面板 + 🕗 计算历史面板。
+
+#### Prompt 摘要
+
+> "标题栏 ☰ 和 🕗 按钮目前只有视觉。实现点击打开对应面板。导航面板显示计算器模式列表（标准/科学/绘图/日期计算）。历史面板显示计算记录。"
+
+#### AI 执行内容
+
+**NavigationPanel.vue 新组件**：
+- 模式列表：标准（高亮激活）、科学/绘图/日期计算（灰色 `disabled` + "未开发"标签）
+- 遮罩点击关闭
+
+**HistoryPanel.vue 新组件**：
+- 计算历史列表（expression + result）
+- 每次 `calculate()` 成功后自动 `push` 记录
+- `[清除]` 按钮一键清空
+
+**useCalculator.js 新增**：
+
+| 新增项 | 说明 |
+|--------|------|
+| `isNavPanelOpen` | 导航面板开关 |
+| `isHistoryPanelOpen` | 历史面板开关 |
+| `calcHistory` | `Array<{ expression, result }>` |
+| `addHistory()` | 自动记录（在 calculate 内调用） |
+| `clearHistory()` | 清空历史 |
+| `toggle*/close*` | 面板显隐控制 ×4 |
+
+**App.vue 改动**：
+- Title Bar ☰ `@click="toggleNavPanel"`
+- Title Bar 🕗 `@click="toggleHistoryPanel"`
+- 条件渲染 NavigationPanel + HistoryPanel
+
+#### 人工决策
+
+- 导航面板非标准模式全部 disabled，不做路由或占位实现
+- 历史记录仅有成功的 `=` 操作（除零不记录）
+- 面板统一使用 `fixed` 遮罩方案（与 MemoryPanel 一致）
+
+#### 修改文件（4 个）
+
+| 文件 | 操作 |
+|------|------|
+| `src/composables/useCalculator.js` | 修改 — +3 状态 + 6 方法 |
+| `src/components/NavigationPanel.vue` | **新建** |
+| `src/components/HistoryPanel.vue` | **新建** |
+| `src/App.vue` | 修改 — titlebar 接线 + 面板渲染 |
+
+#### Git 提交
+
+```
+8af6507 feat(ui): add navigation panel and calculation history panel
+```
+
+---
+
 ## 三、问题解决记录
 
 ### 3.1 Vue 组件通信设计
@@ -420,12 +676,13 @@ bbd8429  style: ...                → 视觉完成
 | 指标 | 值 |
 |------|-----|
 | 总开发时长 | 1 天 |
-| Git 提交次数 | 4 次 |
-| 新建文件 | 14 个 |
-| 修改文件（跨阶段） | 5 个（App.vue 经历 4 次迭代） |
-| 核心计算引擎 | 237 行（10 个方法，7 个状态） |
-| Vite 编译时间 | 平均 465ms |
-| 测试场景 | 20 个手动验证案例 |
+| Git 提交次数 | 12 次 |
+| 新建文件 | 20 个 |
+| 修改文件（跨阶段） | 6 个（App.vue 经历 7 次迭代） |
+| 核心计算引擎 | 350+ 行（30+ 方法，10+ 状态） |
+| Vue 组件 | 6 个（Display + Button + Keypad + MemoryPanel + NavigationPanel + HistoryPanel） |
+| Vite 编译时间 | 平均 460ms |
+| 测试场景 | 30+ 个手动验证案例 |
 
 ---
 
@@ -434,6 +691,7 @@ bbd8429  style: ...                → 视觉完成
 ```
 windows-calculator/
 ├── AI_CONVERSATION.md              ← 本文件
+├── README.md
 ├── index.html
 ├── package.json
 ├── vite.config.js
@@ -444,7 +702,9 @@ windows-calculator/
 │       ├── phase0_scaffold.md
 │       ├── phase1_layout.md
 │       ├── phase2_logic.md
-│       └── phase3_style.md
+│       ├── phase3_style.md
+│       ├── phase3_memory.md
+│       └── phase3_memory_history.md
 │
 └── src/
     ├── main.js
@@ -457,7 +717,10 @@ windows-calculator/
     ├── components/
     │   ├── CalculatorDisplay.vue
     │   ├── CalculatorButton.vue
-    │   └── CalculatorKeypad.vue
+    │   ├── CalculatorKeypad.vue
+    │   ├── MemoryPanel.vue
+    │   ├── NavigationPanel.vue
+    │   └── HistoryPanel.vue
     └── composables/
         └── useCalculator.js
 ```
@@ -467,20 +730,45 @@ windows-calculator/
 ## 六、Git 提交历史
 
 ```
+16c687d docs: update README for Windows 11 UI, memory and history features
+8af6507 feat(ui): add navigation panel and calculation history panel
+d6a906a feat(memory): add memory history panel with item operations
+c4c272e feat(memory): implement calculator memory operations
+820248a style(ui): adapt calculator layout to Windows 11 standard design
+8430fcb fix(memory): normalize floating point precision in memory operations
+608cfc8 docs: add README.md — project overview with tech stack, features, and AI collaboration notes
+5dc82b4 docs: add AI_CONVERSATION.md — complete AI-assisted development record
 bbd8429 style: apply Windows Calculator visual theme
 94c829d feat(logic): implement calculator computation engine
 bddc7a1 feat(layout): add calculator display, button, and keypad grid components
 6214080 chore: scaffold Vue3 + Vite project for Windows Calculator
 ```
 
+所有提交遵循 [Conventional Commits](https://www.conventionalcommits.org/) 规范。
+
 ---
 
-## 七、已知局限与后续改进方向
+## 七、当前功能范围
 
-| 项目 | 优先级 | 说明 |
+### 已实现 ✅
+
+| 功能 | 说明 |
+|------|------|
+| **Standard Calculator** | 完整四则运算、连续计算、C/CE、⌫、±、%、浮点精度 |
+| **Memory System** | MS / MR / M+ / M- / MC，含 disabled 状态管理 |
+| **Memory History Panel** | M∨ 面板、多条目、hover 操作、条目 Recall |
+| **Calculation History** | 自动记录计算表达式和结果、一键清除 |
+| **Navigation Panel** | 模式列表、非标准模式标记"未开发" |
+| **Windows 11 UI** | Title Bar、Memory Row、4×6 Grid、三态按钮、蓝色等号、响应式 |
+
+### 未实现 ⚠️
+
+| 功能 | 优先级 | 说明 |
 |------|--------|------|
-| √ / x² / 1/x 功能 | 中 | UI 已有，逻辑未接线 |
-| Memory 功能（MC/MR/M+/M-/MS） | 中 | 需新增一行记忆按钮 |
+| 科学计算器 (Scientific) | 低 | 导航入口保留，标记"未开发" |
+| 绘图计算器 (Graphing) | 低 | 导航入口保留，标记"未开发" |
+| 日期计算 (Date Calculation) | 低 | 导航入口保留，标记"未开发" |
+| √ / x² / 1/x 功能 | 中 | UI 按钮存在，逻辑未接线 |
 | 键盘输入监听 | 低 | `keydown` 事件映射到按钮 |
 | 长数字自适应字号 | 低 | display 溢出时动态缩小字体 |
 | 暗色主题 | 低 | `prefers-color-scheme: dark` 媒体查询 + 第二套变量 |
