@@ -1,23 +1,37 @@
 <script setup>
-// Root component — calculator will be assembled here in later phases.
+import CalculatorDisplay from './components/CalculatorDisplay.vue'
+import CalculatorKeypad from './components/CalculatorKeypad.vue'
+
+// Placeholder — logic will be added in Phase 2
+const expression = ''
+const currentValue = '0'
 </script>
 
 <template>
   <div class="app">
-    <h1>Windows Calculator</h1>
-    <p>Project scaffold ready.</p>
+    <div class="calculator">
+      <CalculatorDisplay
+        :expression="expression"
+        :currentValue="currentValue"
+      />
+      <CalculatorKeypad />
+    </div>
   </div>
 </template>
 
 <style scoped>
 .app {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  color: #333;
-  background: #f3f3f3;
+  background: #e8e8e8;
+}
+
+.calculator {
+  width: 320px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
 }
 </style>
