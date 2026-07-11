@@ -43,7 +43,7 @@
 | Vue Composables | `useCalculator()` 集中状态管理 |
 | CSS Grid | 4×6 按钮网格 + Memory Row 布局 |
 | CSS Custom Properties | 25+ 设计令牌，统一主题管理 |
-| Git | 版本管理，11 次小粒度提交 |
+| Git | 版本管理，13 次小粒度提交 |
 
 **零第三方 UI 库**：所有样式纯手写，无 Bootstrap / Element Plus / Tailwind 依赖。
 
